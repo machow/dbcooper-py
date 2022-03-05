@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+markers = [
+    "ex: a test runs against ExampleClass",
+    "ex2: a test runs against ExampleClass2",
+]
+testpaths = [
+    "template_python_pkg",
+]
+
+[tool.setuptools_scm]
