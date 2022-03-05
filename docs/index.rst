@@ -1,4 +1,4 @@
-Welcome to template_python_pkg's documentation!
+Welcome to dbcooper's documentation!
 ================================
 
 .. toctree::

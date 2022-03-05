@@ -1,6 +1,6 @@
 import pytest
 
-from template_python_pkg import ExampleClass, ExampleClass2
+from dbcooper import ExampleClass, ExampleClass2
 
 params = [
     pytest.param(ExampleClass, id="ex", marks=pytest.mark.ex),

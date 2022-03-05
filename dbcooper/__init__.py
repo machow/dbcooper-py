@@ -2,7 +2,7 @@ from importlib.metadata import version as _v
 
 # Set version -----------------------------------------------------------------
 
-__version__ = _v("template_python_pkg")
+__version__ = _v("dbcooper")
 
 del _v
 

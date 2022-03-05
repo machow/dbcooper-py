@@ -1,7 +1,7 @@
 Example Class
 =============
 
-.. currentmodule:: template_python_pkg
+.. currentmodule:: dbcooper
 
 Constructor
 -----------

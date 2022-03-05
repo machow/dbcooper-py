@@ -8,7 +8,7 @@ markers = [
     "ex2: a test runs against ExampleClass2",
 ]
 testpaths = [
-    "template_python_pkg",
+    "dbcooper",
 ]
 
 [tool.setuptools_scm]

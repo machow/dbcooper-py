@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "template_python_pkg"
+project = "dbcooper"
 copyright = "2022, Michael Chow"
 author = "Michael Chow"
 

@@ -51,7 +51,7 @@ jobs:
           REQUIREMENTS: ${{ matrix.requirements }}
       - name: Run tests
         run: |
-          pytest template_python_pkg
+          pytest
 
   build-docs:
     name: "Build Docs"
