@@ -1,0 +1,39 @@
+```{python}
+from dbcooper.autotables import AutoTable
+```
+
+```{python}
+from sqlalchemy import create_engine
+from siuba.tests.helpers import SqlBackend
+
+import lahman
+
+engine = create_engine("sqlite:///:memory:")
+```
+
+```{python}
+for name in ["allstar_full", "appearances"]:
+    getattr(lahman, name)().to_sql(name, engine)
+```
+
+```{python}
+tbl = AutoTable(engine)
+tbl._init()
+```
+
+```{python}
+from siuba import show_query, _, count
+
+tbl.default.allstar_full() >> count(_.playerID)
+```
+
+## Bigquery
+
+```{python}
+from siuba.tests.helpers import BigqueryBackend
+be = BigqueryBackend("bigquery")
+```
+
+```{python}
+be.engine.execute("SELECT 1")
+```
