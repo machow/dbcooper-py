@@ -28,9 +28,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      # setup docker and gcp authentication ----
+      #
       - name: Run docker-compose
         run: |
           docker-compose up --build -d
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: siuba-tests
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # install python w/ dependencies, and run tests ----
+      #
       - uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
@@ -48,9 +61,23 @@ jobs:
 
         env:
           REQUIREMENTS: ${{ matrix.requirements }}
+
       - name: Run tests
         run: |
           pytest
+        env:
+          SB_TEST_MYSQLPORT: 3307
+          SB_TEST_PGPORT: 5433
+
+          SB_TEST_BQDATABASE: ""
+          SB_TEST_BQPROJECT: dbcooper-tests
+
+          SB_TEST_SNOWFLAKEDATABASE: "DBCOOPER_DB1"
+          SB_TEST_SNOWFLAKEUSER: "DBCOOPER_CI"
+          SB_TEST_SNOWFLAKEPASSWORD: ${{ secrets.SB_TEST_SNOWFLAKEPASSWORD }}
+          SB_TEST_SNOWFLAKEHOST: "qf04441.us-east-2.aws"
+          SB_TEST_SNOWFLAKEOPTIONS: "warehouse=COMPUTE_WH&role=USER_DBCOOPER_CI"
+
 
   build-docs:
     name: "Build Docs"
