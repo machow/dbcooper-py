@@ -41,8 +41,12 @@ be_bq = BigqueryBackend("bigquery")
 from dbcooper.autotables import AutoTable
 from dbcooper.builder import TableFinder
 
-find_from_schema = TableFinder(exclude=(format_from_part="table")
+#find_from_schema = TableFinder(exclude=(format_from_part="table")
 
-tbl = AutoTable(be_bq.engine, find_from_schema)
+tbl = AutoTable(be_snow.engine)#, find_from_schema)
 tbl._init()
+```
+
+```{python}
+tbl.list()
 ```
