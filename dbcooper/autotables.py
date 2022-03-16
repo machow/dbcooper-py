@@ -1,55 +1,17 @@
 from siuba.sql import LazyTbl
 from sqlalchemy import create_engine
 
-def split_table_name(engine, name):
-    # This is a placeholder function, to handle database specific wrangling
-    # of <schema_name>.<table_name>. Ideally, this should be handled much more
-    # thoroughly, as table names can have periods in them etc...
-    # We may need to issue custom queries to get schema + names, etc..
-
-    # Note that a name can technically have a period in it, so this is not a
-    # long term solution
-    parts = name.split(".")
-    if len(parts) == 1:
-        return "default", parts[0]
-    elif len(parts) == 2:
-        return tuple(parts)
-    else:
-        raise NotImplementedError(f"Cannot handle table name with {len(parts)} parts")
-
-
-class AttributeDict:
-    def __init__(self):
-        self._d = {}
-
-    def __getattr__(self, k):
-        if k in self._d:
-            return self._d[k]
-
-        raise AttributeError("No attribute %s" % k)
-
-    def __setitem__(self, k, v):
-        self._d[k] = v
-
-    def __dir__(self):
-        return list(self._d.keys())
-
+from .builder import TableFinder
+from .tables import query_to_tbl
 
 class AutoTable:
-    def __init__(self, engine, table_formatter=None, table_filter=None):
+    def __init__(self, engine, table_finder=TableFinder()):
+        if isinstance(engine, str):
+            engine = create_engine(engine)
+
         self._engine = engine
-        self._table_names = tuple()
         self._accessors = {}
-
-        if table_formatter is None:
-            self._table_formatter = lambda s: s
-        else:
-            self._table_formatter = table_formatter
-
-        if table_filter is None:
-            self._table_filter = lambda x: True
-        else:
-            self._table_filter = table_filter
+        self._table_finder = table_finder
 
     def __getattr__(self, k):
         if k in self._accessors:
@@ -57,85 +19,50 @@ class AutoTable:
 
         raise AttributeError("No such attribute %s" % k)
 
+    def __getitem__(self, k):
+        if k in self._accessors:
+            return self._accessors[k]
+
+        raise AttributeError("No such attribute %s" % k)
+
+
     def __dir__(self):
-        return list(self._accessors.keys())
+        return ["query"] + list(self._accessors.keys())
+
+    def _ipython_key_completions_(self):
+        return list(self._accessors)
 
     def _init(self):
-        # remove any previously initialized attributes ----
-        prev_table_names = self._table_names
-        for k in prev_table_names:
-            del self.__dict__[k]
+        accessors = self._table_finder.create_accessors(self._engine)
+        self._accessors = accessors
 
-        # initialize ----
-        self._table_names = tuple(self._engine.table_names())
+    def list(self, raw=False):
+        dialect = self._engine.dialect
+        with self._engine.connect() as conn:
+            tables = self._table_finder.list_tables(dialect, conn)
 
-        mappings = {}
-        for name in self._table_names:
-            if self._table_filter is not None and not self._table_filter(name):
-                continue
+        if raw:
+            return tables
+        else:
+            results = []
+            for table in tables:
+                ident = self._table_finder.identify_table(dialect, table)
+                results.append(f"{ident.schema}.{ident.table}")
 
-            fmt_name = self._table_formatter(name)
-            if fmt_name in mappings:
-                raise Exception("multiple tables w/ formatted name: %s" % fmt_name)
-            mappings[fmt_name] = name
+            return results
 
-        self._attach_mappings(mappings)
+    def query(self, query):
+        return query_to_tbl(self._engine, query)
 
-    def _attach_mappings(self, mappings):
-        for k, v in mappings.items():
-            schema, table = split_table_name(self._engine, k)
+    def tbl(self, name, schema=None):
+        from sqlalchemy import sql
+        
+        # sql dialects like snowflake do not have great reflection capabilities,
+        # so we execute a trivial query to discover the column names
+        explore_table = sql.table(name, schema=schema)
+        trivial = explore_table.select(sql.text("0 = 1")).add_columns(sql.text("*"))
 
-            if schema not in self._accessors:
-                self._accessors[schema] = AttributeDict()
+        q = self._engine.execute(trivial)
 
-            self._accessors[schema][table] = self._table_factory(v)
-
-    def _table_factory(self, table_name):
-        return TableFactory(self._engine, table_name)
-
-
-class TableFactory:
-    def __init__(self, engine, table_name):
-        self.engine = engine
-        self.table_name = table_name
-
-    def __call__(self):
-        return self._create_table()
-
-    def _create_table(self):
-        return LazyTbl(self.engine, self.table_name)
-
-    def _row_html(self, col):
-        """Return formatted HTML for a single row of the doc table.
-        Result will be for a column and its description.
-        """
-
-        return f"<tr><td>{col.name}</td><td>{col.type}</td><td>{col.comment}</td></tr>"
-
-    def _repr_html_(self):
-        tbl = self._create_table()
-
-        row_html = [self._row_html(col) for col in tbl.tbl.columns]
-        table_body_html = "\n".join(row_html)
-
-        return f"""
-            <h3> {tbl.tbl.name} </h3>
-            <p> {tbl.tbl.comment} </p>
-            <table>
-                <tr>
-                    <th>name</th>
-                    <th>type</th>
-                    <th>description</th>
-                </tr>
-                {table_body_html}
-            </table>
-            """
-
-
-#tbl = AutoTable(
-#    get_engine(),
-#    lambda s: s,  # s.replace(".", "_"),
-#    lambda s: "zzz_test_" not in s if not is_development() else True,
-#)
-
-#tbl._init()
+        columns = [sql.column(k) for k in q.keys()]
+        return LazyTbl(self._engine, sql.table(name, *columns, schema=schema))
