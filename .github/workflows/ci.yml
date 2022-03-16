@@ -28,6 +28,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Run docker-compose
+        run: |
+          docker-compose up --build -d
       - uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
