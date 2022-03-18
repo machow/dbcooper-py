@@ -1,6 +1,6 @@
 import pytest
 
-from dbcooper.autotables import DbCooper
+from dbcooper import DbCooper
 from dbcooper.tests.helpers import EXAMPLE_SCHEMAS, EXAMPLE_DATA, assert_frame_sort_equal
 from dbcooper.tables import DbcSimpleTable
 from dbcooper.builder import TableFinder
