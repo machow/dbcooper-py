@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from .builder import TableFinder
 from .tables import query_to_tbl
 
-class AutoTable:
+class DbCooper:
     def __init__(self, engine, table_finder=TableFinder()):
         if isinstance(engine, str):
             engine = create_engine(engine)

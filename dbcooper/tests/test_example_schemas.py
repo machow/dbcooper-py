@@ -1,6 +1,6 @@
 import pytest
 
-from dbcooper.autotables import AutoTable
+from dbcooper.autotables import DbCooper
 from dbcooper.tests.helpers import EXAMPLE_SCHEMAS, EXAMPLE_DATA, assert_frame_sort_equal
 from dbcooper.tables import DbcSimpleTable
 from dbcooper.builder import TableFinder
@@ -12,9 +12,9 @@ def tbl(backend):
         # snowflake can't do reflection on schemas that aren't uppercase, see
         # see https://github.com/snowflakedb/snowflake-sqlalchemy/issues/276
         finder = TableFinder(table_builder=DbcSimpleTable)
-        tbl = AutoTable(backend.engine, table_finder=finder)
+        tbl = DbCooper(backend.engine, table_finder=finder)
     else:
-        tbl = AutoTable(backend.engine)
+        tbl = DbCooper(backend.engine)
 
     tbl._init()
     return tbl
