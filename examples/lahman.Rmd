@@ -1,0 +1,60 @@
+```{python}
+# %load_ext autoreload
+```
+
+```{python}
+from dbcooper import DbCooper
+from sqlalchemy import create_engine
+import lahman
+
+def load_tables_for_engine(engine, exclude=[], **kwargs):
+    for name in lahman._accessors:
+        if name in exclude: continue
+        df = getattr(lahman, name)()
+        df.to_sql(name, engine, **kwargs)
+```
+
+The example below shows 3 modes:
+
+* simple: table names are `<schema>_<table>`.
+* formatted: table names are `<table>`.
+* grouped: each schema is its own dictionary, accessed using `<schema>.<table>`.
+
+
+## Sqlite (simple)
+
+```{python}
+engine = create_engine("sqlite://")
+engine.execute("ATTACH ':memory:' AS lahman")
+load_tables_for_engine(engine, schema="lahman")
+```
+
+```{python}
+tbl_flat = DbCooper(engine)
+```
+
+```{python}
+tbl_flat.lahman_allstar_full()
+```
+
+## Formatting table names
+
+```{python}
+from dbcooper import AccessorBuilder
+
+# omits schema, and keeps only table name
+builder = AccessorBuilder(format_from_part="table")
+
+tbl_flat2 = DbCooper(engine, accessor_builder=builder)
+tbl_flat2.allstar_full()
+```
+
+## Grouping tables by schema
+
+```{python}
+from dbcooper import TableFinder
+from dbcooper.finder import AccessorHierarchyBuilder
+
+tbl_nested = DbCooper(engine, accessor_builder=AccessorHierarchyBuilder())
+tbl_nested.lahman.allstar_full()
+```

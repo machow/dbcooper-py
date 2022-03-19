@@ -1,0 +1,52 @@
+---
+jupyter:
+  jupytext:
+    formats: ipynb,Rmd
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.13.7
+  kernelspec:
+    display_name: venv-dbcooper-py
+    language: python
+    name: venv-dbcooper-py
+---
+
+```{python}
+from dotenv import load_dotenv
+from dbcooper.utils import SingleGeneric
+from sqlalchemy.schema import CreateSchema
+
+load_dotenv()
+
+from dbcooper.tests.helpers import create_examples
+```
+
+```{python}
+from siuba.tests.helpers import CloudBackend, SqlBackend, BigqueryBackend
+
+be_snow = CloudBackend("snowflake")
+be_sqlite = SqlBackend("sqlite")
+be_pg = SqlBackend("postgresql")
+be_mysql = SqlBackend("mysql")
+be_bq = BigqueryBackend("bigquery")
+```
+
+```{python}
+#create_examples(be_snow.engine)
+```
+
+```{python}
+from dbcooper.autotables import AutoTable
+from dbcooper.builder import TableFinder
+
+#find_from_schema = TableFinder(exclude=(format_from_part="table")
+
+tbl = AutoTable(be_snow.engine)#, find_from_schema)
+tbl._init()
+```
+
+```{python}
+tbl.list()
+```
