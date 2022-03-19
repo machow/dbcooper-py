@@ -3,11 +3,8 @@
 ```
 
 ```{python}
-import os
-
-from dbcooper.autotables import AutoTable
-from sqlalchemy import create_engine, inspect
-from siuba.tests.helpers import SqlBackend
+from dbcooper import DbCooper
+from sqlalchemy import create_engine
 import lahman
 
 def load_tables_for_engine(engine, exclude=[], **kwargs):
@@ -17,233 +14,47 @@ def load_tables_for_engine(engine, exclude=[], **kwargs):
         df.to_sql(name, engine, **kwargs)
 ```
 
-```{python}
-from dbcooper.builder import TableFinder
+The example below shows 3 modes:
 
-# alternative approach, does not include schema in the name
-find_from_schema = TableFinder(format_from_part="table")
+* simple: table names are `<schema>_<table>`.
+* formatted: table names are `<table>`.
+* grouped: each schema is its own dictionary, accessed using `<schema>.<table>`.
+
+
+## Sqlite (simple)
+
+```{python}
+engine = create_engine("sqlite://")
+engine.execute("ATTACH ':memory:' AS lahman")
+load_tables_for_engine(engine, schema="lahman")
 ```
 
 ```{python}
-
-```
-
-## Sqlite
-
-```{python}
-from sqlalchemy import create_engine
-from dbcooper.autotables import AutoTable
-
-engine = create_engine("sqlite:///:memory:")
+tbl_flat = DbCooper(engine)
 ```
 
 ```{python}
-load_tables_for_engine(engine)
+tbl_flat.lahman_allstar_full()
 ```
 
+## Formatting table names
+
 ```{python}
-tbl_sqlite = AutoTable(engine)
-tbl_sqlite._init()
+from dbcooper import AccessorBuilder
+
+# omits schema, and keeps only table name
+builder = AccessorBuilder(format_from_part="table")
+
+tbl_flat2 = DbCooper(engine, accessor_builder=builder)
+tbl_flat2.allstar_full()
 ```
 
-```{python}
-tbl_sqlite.query
-```
+## Grouping tables by schema
 
 ```{python}
-tbl_sqlite.main_allstar_full()
-```
+from dbcooper import TableFinder
+from dbcooper.finder import AccessorHierarchyBuilder
 
-```{python}
-tbl_sqlite2 = AutoTable(engine, find_from_schema)
-tbl_sqlite2._init()
-
-```
-
-```{python}
-tbl_sqlite2.college_playing()
-```
-
-## Postgresql
-
-```{python}
-from siuba.tests.helpers import SqlBackend
-be_pg = SqlBackend("postgresql")
-be_pg.engine.execute("CREATE SCHEMA IF NOT EXISTS lahman")
-```
-
-```{python}
-#load_tables_for_engine(be_pg.engine, schema="lahman", if_exists="replace")
-```
-
-```{python}
-tbl_pg = AutoTable(be_pg.engine)
-tbl_pg._init()
-tbl_pg.lahman_allstar_full()
-```
-
-```{python}
-tbl_pg2 = AutoTable(be_pg.engine, find_from_schema)
-tbl_pg2._init()
-tbl_pg2.allstar_full()
-
-```
-
-## Bigquery
-
-```{python}
-from siuba.tests.helpers import BigqueryBackend
-be_bq = BigqueryBackend("bigquery")
-```
-
-```{python}
-# Uncomment to create the sandbox_lahman dataset on bigquery
-
-# e.g.
-# df.to_gbq("sandbox_lahman.allstar_full", "siuba-tests", if_exists="replace")
-# for name in ["allstar_full", "appearances"]:
-#     getattr(lahman, name)().to_gbq(f"sandbox.{name}", "siuba-tests", if_exists="replace")
-```
-
-```{python}
-tbl_bq = AutoTable(be_bq.engine)
-tbl_bq._init()
-# TODO: too many values to unpack, need to initialize as Table(..., schema="<project>.<schema>")
-tbl_bq.ci_github_siuba_002()
-```
-
-## Snowflake
-
-```{python}
-from siuba.tests.helpers import CloudBackend
-```
-
-```{python}
-be_snow = CloudBackend("snowflake")
-be_snow.engine.execute("SELECT 1").fetchall()
-```
-
-```{python}
-# Use the underlying snowflake connector to upload DataFrames
-# I tried passing its pd_writer to pandas.DataFrame.to_sql, but it errored for some tables.
-from snowflake.connector.pandas_tools import write_pandas
-args, kwargs = be_snow.engine.dialect.create_connect_args(be_snow.engine.url)
-conn = be_snow.engine.dialect.connect(*args, **kwargs)
-
-# for name, data in lahman._accessors.items():
-#     write_pandas(
-#         conn,
-#         data(), name, "DATASETS", "LAHMAN", auto_create_table=True
-#     )
-    
-```
-
-```{python}
-from dbcooper.inspect import list_tables, format_table, identify_table, TableName
-
-with be_snow.engine.connect() as conn:
-    list_tables(be_snow.engine.dialect, conn)
-    
-ident = identify_table(be_snow.engine.dialect, TableName(database="postgres", schema='LAHMAN', table='allstar_full'))
-```
-
-```{python}
-
-```
-
-```{python}
-from dbcooper.autotables import AutoTable
-
-tbl_snow = AutoTable(be_snow.engine)
-tbl_snow._init()
-
-# TODO: no clear explanation of how to select via a fully qualified
-# tablename in snowflake. I'm guessing the database name needs to be
-# attached to schema?
-tbl_snow.lahman_allstar_full
-```
-
-```{python}
-tbl_snow.
-```
-
-```{python}
-from siuba.data import mtcars
-
-from snowflake.connector.pandas_tools import write_pandas
-args, kwargs = be_snow.engine.dialect.create_connect_args(be_snow.engine.url)
-conn = be_snow.engine.dialect.connect(*args, **kwargs)
-
-# write_pandas(
-#     conn,
-#     mtcars, "mtcars", "DATASETS", "MTCARS", auto_create_table=True
-# )
-```
-
-## List Tables
-
-```{python}
-from dbcooper.inspect import list_tables
-```
-
-```{python}
-list_tables(be_snow.engine.dialect, be_snow.engine.connect())
-```
-
-```{python}
-# %autoreload
-list_tables(be_pg.engine.dialect, be_pg.engine)
-```
-
-```{python}
-# %autoreload
-```
-
-```{python}
-list_tables(be_bq.engine.dialect, be_bq.engine.connect())
-```
-
-## Sanity check autotables
-
-
-### sqlite
-
-```{python}
-tbl_sqlite.main_allstar_full
-```
-
-### pg
-
-```{python}
-tbl_pg.lahman_allstar_full()
-```
-
-### bq
-
-```{python}
-#tbl_bq.
-```
-
-### sf
-
-```{python}
-con = be_snow.engine.connect()
-```
-
-```{python}
-con.connection.connection
-```
-
-```{python}
-from sqlalchemy import Table, MetaData
-
-Table("siuba_00440d91-0efc-4262-b20c-d5bb1173b025", MetaData(bind=be_snow.engine), schema="CI.TESTS", autoload_with=be_snow.engine)
-```
-
-```{python}
-# %autoreload
-```
-
-```{python}
-tbl_snow.default.allstar_full.table_name
+tbl_nested = DbCooper(engine, accessor_builder=AccessorHierarchyBuilder())
+tbl_nested.lahman.allstar_full()
 ```

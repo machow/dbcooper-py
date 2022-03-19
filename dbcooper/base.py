@@ -23,6 +23,10 @@ class TableName:
         elif part == "table":
             return -1
 
+    def apply_maybe(self, f):
+        tup = self.to_tuple()
+        return self.__class__(*[f(x) if x is not None else x for x in tup])
+
 @dataclass(frozen=True)
 class TableIdentity:
     schema: "str | quoted_name | None"

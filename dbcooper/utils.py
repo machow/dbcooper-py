@@ -32,3 +32,5 @@ class SingleGeneric:
 
     def __repr__(self):
         return f"{type(self)}({self.name})"
+
+

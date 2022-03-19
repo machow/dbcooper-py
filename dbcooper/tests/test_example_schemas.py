@@ -3,7 +3,7 @@ import pytest
 from dbcooper import DbCooper
 from dbcooper.tests.helpers import EXAMPLE_SCHEMAS, EXAMPLE_DATA, assert_frame_sort_equal
 from dbcooper.tables import DbcSimpleTable
-from dbcooper.builder import TableFinder
+from dbcooper.finder import TableFinder
 from siuba import collect
 
 @pytest.fixture
@@ -11,8 +11,7 @@ def tbl(backend):
     if backend.name == "snowflake":
         # snowflake can't do reflection on schemas that aren't uppercase, see
         # see https://github.com/snowflakedb/snowflake-sqlalchemy/issues/276
-        finder = TableFinder(table_builder=DbcSimpleTable)
-        tbl = DbCooper(backend.engine, table_finder=finder)
+        tbl = DbCooper(backend.engine, table_factory=DbcSimpleTable)
     else:
         tbl = DbCooper(backend.engine)
 
