@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Mapping
 
 from .inspect import TableName, TableIdentity, list_tables, format_table, identify_table
