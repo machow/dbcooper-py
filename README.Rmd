@@ -70,7 +70,7 @@ dbc.list()
 dbc.tbl("Batting")
 
 from siuba import _, count
-dbc.tbl("Batting") >> count(_.teamId)
+dbc.tbl("Batting") >> count(_.teamID)
 ```
 
 If you'd rather start from a SQL query, use the `.query()` method.

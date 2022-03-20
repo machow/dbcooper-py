@@ -25,7 +25,8 @@ pip install dbcooper
 The dbcooper package asks you to create the connection first.
 As an example, we'll use the Lahman baseball database package (`lahman`).
 
-```{python}
+
+```python
 import lahman
 from sqlalchemy import create_engine
 
@@ -42,7 +43,8 @@ load_tables_for_engine(engine, schema="lahman")
 
 Next we'll set up dbcooper
 
-```{python}
+
+```python
 from dbcooper import DbCooper
 
 dbc = DbCooper(engine)
@@ -57,7 +59,6 @@ The `DbCooper` object contains two important things:
 
 TODO: GIF of accessor + autocompletion (or put it at the very top)
 
-
 ### Using database functions
 
 * `.list()`: Get a list of tables
@@ -65,17 +66,79 @@ TODO: GIF of accessor + autocompletion (or put it at the very top)
 * `.query()`: Perform a SQL query and work with the result.
 * `._engine`: Get the underlying sqlalchemy engine.
 
-```{python}
+
+```python
 dbc.list()
 dbc.tbl("Batting")
 
 from siuba import _, count
-dbc.tbl("Batting") >> count(_.teamId)
+dbc.tbl("Batting") >> count(_.teamID)
 ```
+
+
+
+
+<div><pre># Source: lazy query
+# DB Conn: Engine(sqlite://)
+# Preview:
+</pre><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>teamID</th>
+      <th>n</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CHN</td>
+      <td>5060</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>PHI</td>
+      <td>4971</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>PIT</td>
+      <td>4920</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SLN</td>
+      <td>4853</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CIN</td>
+      <td>4731</td>
+    </tr>
+  </tbody>
+</table>
+</div><p># .. may have more rows</p></div>
+
+
 
 If you'd rather start from a SQL query, use the `.query()` method.
 
-```{python}
+
+```python
 dbc.query("""
     SELECT
         playerID,
@@ -84,6 +147,66 @@ dbc.query("""
     GROUP BY playerID
 """)
 ```
+
+
+
+
+<div><pre># Source: lazy query
+# DB Conn: Engine(sqlite://)
+# Preview:
+</pre><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>playerID</th>
+      <th>AB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>aardsda01</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>aaronha01</td>
+      <td>12364</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>aaronto01</td>
+      <td>944</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>aasedo01</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>abadan01</td>
+      <td>21</td>
+    </tr>
+  </tbody>
+</table>
+</div><p># .. may have more rows</p></div>
+
+
 
 ## Developing
 
@@ -107,7 +230,6 @@ pytest -m 'not snowflake and not bigquery'
 # stop on first failure, drop into debugger
 pytest -x --pdb
 ```
-
 
 ### Release
 

@@ -24,3 +24,10 @@ docs-build:
 
 docs-watch:
 	cd docs && sphinx-autobuild . ./_build/html $(SPHINX_BUILDARGS)
+
+README.md: README.Rmd
+	jupytext --from Rmd --to ipynb --output - $^ \
+		| jupyter nbconvert \
+			--stdin --to markdown \
+			--execute --ExecutePreprocessor.kernel_name='venv-dbcooper-py' \
+			--output $@
