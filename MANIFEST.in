@@ -1,0 +1,5 @@
+exclude .*
+prune .*
+prune requirements
+prune binder
+prune docs
