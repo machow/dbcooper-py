@@ -69,69 +69,25 @@ TODO: GIF of accessor + autocompletion (or put it at the very top)
 
 ```python
 dbc.list()
-dbc.tbl("Batting")
+dbc.tbl("Salaries")
 
 from siuba import _, count
-dbc.tbl("Batting") >> count(_.teamID)
+dbc.tbl("Salaries") >> count(_.teamID)
 ```
 
 
 
 
-<div><pre># Source: lazy query
-# DB Conn: Engine(sqlite://)
-# Preview:
-</pre><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>teamID</th>
-      <th>n</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>CHN</td>
-      <td>5060</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>PHI</td>
-      <td>4971</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>PIT</td>
-      <td>4920</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>SLN</td>
-      <td>4853</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>CIN</td>
-      <td>4731</td>
-    </tr>
-  </tbody>
-</table>
-</div><p># .. may have more rows</p></div>
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+      teamID    n
+    0    LAN  957
+    1    CLE  949
+    2    PHI  948
+    3    BOS  944
+    4    SLN  943
+    # .. may have more rows
 
 
 
@@ -151,60 +107,16 @@ dbc.query("""
 
 
 
-<div><pre># Source: lazy query
-# DB Conn: Engine(sqlite://)
-# Preview:
-</pre><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>playerID</th>
-      <th>AB</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>aardsda01</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>aaronha01</td>
-      <td>12364</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>aaronto01</td>
-      <td>944</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>aasedo01</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>abadan01</td>
-      <td>21</td>
-    </tr>
-  </tbody>
-</table>
-</div><p># .. may have more rows</p></div>
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+        playerID     AB
+    0  aardsda01      4
+    1  aaronha01  12364
+    2  aaronto01    944
+    3   aasedo01      5
+    4   abadan01     21
+    # .. may have more rows
 
 
 

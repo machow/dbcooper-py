@@ -1,3 +1,8 @@
+```{python include=FALSE, tags=c("hide-cell")}
+import pandas as pd
+pd.set_option("display.notebook_repr_html", False)
+```
+
 # dbcooper-py
 
 [![CI](https://github.com/machow/dbcooper-py/actions/workflows/ci.yml/badge.svg)](https://github.com/machow/dbcooper-py/actions/workflows/ci.yml)
@@ -67,10 +72,10 @@ TODO: GIF of accessor + autocompletion (or put it at the very top)
 
 ```{python}
 dbc.list()
-dbc.tbl("Batting")
+dbc.tbl("Salaries")
 
 from siuba import _, count
-dbc.tbl("Batting") >> count(_.teamID)
+dbc.tbl("Salaries") >> count(_.teamID)
 ```
 
 If you'd rather start from a SQL query, use the `.query()` method.

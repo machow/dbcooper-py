@@ -29,5 +29,8 @@ README.md: README.Rmd
 	jupytext --from Rmd --to ipynb --output - $^ \
 		| jupyter nbconvert \
 			--stdin --to markdown \
-			--execute --ExecutePreprocessor.kernel_name='venv-dbcooper-py' \
+			--execute \
+			--ExecutePreprocessor.kernel_name='venv-dbcooper-py' \
+			--TagRemovePreprocessor.remove_all_outputs_tags='hide-cell' \
+			--TagRemovePreprocessor.remove_input_tags='hide-cell' \
 			--output $@
