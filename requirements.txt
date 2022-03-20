@@ -16,6 +16,8 @@ jupyter-core==4.9.2
     # via nbformat
 jupytext==1.13.7
     # via dbcooper (setup.cfg)
+lahman==0.0.1
+    # via dbcooper (setup.cfg)
 markdown-it-py==1.1.0
     # via
     #   jupytext
@@ -29,12 +31,14 @@ numpy==1.22.3
     #   pandas
     #   siuba
 pandas==1.4.1
-    # via siuba
+    # via
+    #   lahman
+    #   siuba
 pyrsistent==0.18.1
     # via jsonschema
 python-dateutil==2.8.2
     # via pandas
-pytz==2021.3
+pytz==2022.1
     # via pandas
 pyyaml==6.0
     # via

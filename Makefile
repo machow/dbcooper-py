@@ -11,12 +11,12 @@ dev-stop:
 test:
 	pytest
 
-requirements/dev.txt:
+requirements/dev.txt: setup.cfg
 	@# allows you to do this...
 	@# make requirements | tee > requirements/some_file.txt
 	@pip-compile setup.cfg --rebuild --extra dev --output-file=- > $@
 
-requirements.txt:
+requirements.txt: setup.cfg
 	@pip-compile setup.cfg --rebuild --extra binder --output-file=- > $@
 
 docs-build:
