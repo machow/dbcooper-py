@@ -44,7 +44,7 @@ pyyaml==6.0
     # via
     #   jupytext
     #   siuba
-siuba==0.2.0.dev1
+siuba==0.2.0.dev3
     # via dbcooper (setup.cfg)
 six==1.16.0
     # via python-dateutil
