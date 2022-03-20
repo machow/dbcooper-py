@@ -16,7 +16,7 @@ requirements/dev.txt: setup.cfg
 	@# make requirements | tee > requirements/some_file.txt
 	@pip-compile setup.cfg --rebuild --extra dev --output-file=- > $@
 
-requirements.txt: setup.cfg
+binder/requirements.txt: setup.cfg
 	@pip-compile setup.cfg --rebuild --extra binder --output-file=- > $@
 
 docs-build:
