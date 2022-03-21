@@ -266,17 +266,132 @@ dbc._engine.echo = True
 table_names = dbc.list()
 ```
 
-    2022-03-20 21:50:51,818 INFO sqlalchemy.engine.Engine PRAGMA database_list
-    2022-03-20 21:50:51,819 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 21:50:51,820 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 21:50:51,821 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 21:50:51,821 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 21:50:51,822 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 22:33:00,342 INFO sqlalchemy.engine.Engine PRAGMA database_list
+    2022-03-20 22:33:00,343 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 22:33:00,344 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 22:33:00,345 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 22:33:00,345 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 22:33:00,346 INFO sqlalchemy.engine.Engine [raw sql] ()
 
 
 Note that the log messages above show that the `.list()` method executed two queries:
 One to list tables in the "main" schema (which is empty), and one to list tables
 in the "lahman" schema.
+
+## Advanced Configuration
+
+> ⚠️: These behaviors are well tested, but dbcooper's internals and API may change.
+
+dbcooper can be configured in three ways, each corresponding to a class interface:
+
+* **TableFinder**: Which tables will be used by `dbcooper`.
+* **AccessorBuilder**: How table names are turned into accessors.
+* **DbcDocumentedTable**: The class that defines what an accessor will return.
+
+
+```python
+from sqlalchemy import create_engine
+from dbcooper.data import lahman_sqlite
+from dbcooper import DbCooper, AccessorBuilder
+
+engine = create_engine("sqlite://")
+lahman_sqlite(engine)
+```
+
+### Excluding a schema
+
+
+```python
+from dbcooper import TableFinder
+
+finder = TableFinder(exclude_schemas=["lahman"])
+dbc_no_lahman = DbCooper(engine, table_finder=finder)
+dbc_no_lahman.list()
+```
+
+
+
+
+    []
+
+
+
+### Formatting table names
+
+
+```python
+from dbcooper import AccessorBuilder
+
+# omits schema, and keeps only table name
+# e.g. `salaries`, rather than `lahman_salaries`
+builder = AccessorBuilder(format_from_part="table")
+
+tbl_flat = DbCooper(engine, accessor_builder=builder)
+tbl_flat.salaries()
+```
+
+
+
+
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+       index  yearID teamID lgID   playerID  salary
+    0      0    1985    ATL   NL  barkele01  870000
+    1      1    1985    ATL   NL  bedrost01  550000
+    2      2    1985    ATL   NL  benedbr01  545000
+    3      3    1985    ATL   NL   campri01  633333
+    4      4    1985    ATL   NL  ceronri01  625000
+    # .. may have more rows
+
+
+
+### Grouping tables by schema
+
+
+```python
+from dbcooper import AccessorHierarchyBuilder
+
+tbl_nested = DbCooper(engine, accessor_builder=AccessorHierarchyBuilder())
+
+# note the form: <schema>.<table>
+tbl_nested.lahman.salaries()
+```
+
+
+
+
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+       index  yearID teamID lgID   playerID  salary
+    0      0    1985    ATL   NL  barkele01  870000
+    1      1    1985    ATL   NL  bedrost01  550000
+    2      2    1985    ATL   NL  benedbr01  545000
+    3      3    1985    ATL   NL   campri01  633333
+    4      4    1985    ATL   NL  ceronri01  625000
+    # .. may have more rows
+
+
+
+### Don't show table documentation
+
+
+```python
+from dbcooper import DbcSimpleTable
+
+dbc_no_doc = DbCooper(engine, table_factory=DbcSimpleTable)
+dbc_no_doc.lahman_salaries
+```
+
+
+
+
+    DbcSimpleTable(..., 'salaries', 'lahman')
+
+
+
+
 
 ## Developing
 
