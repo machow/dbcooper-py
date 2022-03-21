@@ -25,6 +25,9 @@ def _list_tables_sqlite(self: Dialect, conn, exclude=None) -> Sequence[TableName
 
     results = []
     for schema in schemas:
+        if schema in exclude:
+            continue
+
         qschema = self.identifier_preparer.quote_identifier(schema)
         qmaster = f"{qschema}.sqlite_master"
         q = conn.exec_driver_sql(query_str.format(qmaster))
