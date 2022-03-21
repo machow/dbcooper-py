@@ -266,12 +266,12 @@ dbc._engine.echo = True
 table_names = dbc.list()
 ```
 
-    2022-03-20 22:33:00,342 INFO sqlalchemy.engine.Engine PRAGMA database_list
-    2022-03-20 22:33:00,343 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 22:33:00,344 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 22:33:00,345 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 22:33:00,345 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 22:33:00,346 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 22:49:37,553 INFO sqlalchemy.engine.Engine PRAGMA database_list
+    2022-03-20 22:49:37,554 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 22:49:37,555 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 22:49:37,555 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 22:49:37,556 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 22:49:37,557 INFO sqlalchemy.engine.Engine [raw sql] ()
 
 
 Note that the log messages above show that the `.list()` method executed two queries:
@@ -391,7 +391,9 @@ dbc_no_doc.lahman_salaries
 
 
 
-
+Note that sqlalchemy dialects like `snowflake-sqlalchemy` cannot look up things
+like table and column descriptions as well as other dialects, so `DbcSimpleTable`
+may be needed to connect to snowflake (see [this issue](https://github.com/snowflakedb/snowflake-sqlalchemy/issues/276)).
 
 ## Developing
 

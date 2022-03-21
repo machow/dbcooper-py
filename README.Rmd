@@ -202,6 +202,9 @@ dbc_no_doc = DbCooper(engine, table_factory=DbcSimpleTable)
 dbc_no_doc.lahman_salaries
 ```
 
+Note that sqlalchemy dialects like `snowflake-sqlalchemy` cannot look up things
+like table and column descriptions as well as other dialects, so `DbcSimpleTable`
+may be needed to connect to snowflake (see [this issue](https://github.com/snowflakedb/snowflake-sqlalchemy/issues/276)).
 
 
 ## Developing
