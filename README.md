@@ -27,18 +27,14 @@ As an example, we'll use the Lahman baseball database package (`lahman`).
 
 
 ```python
-import lahman
 from sqlalchemy import create_engine
+from dbcooper.data import lahman_sqlite
 
-def load_tables_for_engine(engine, exclude=[], **kwargs):
-    for name in lahman._accessors:
-        if name in exclude: continue
-        df = getattr(lahman, name)()
-        df.to_sql(name, engine, **kwargs)
-
+# connect to sqlite
 engine = create_engine("sqlite://")
-engine.execute("ATTACH ':memory:' AS lahman")
-load_tables_for_engine(engine, schema="lahman")
+
+# load the lahman data into the "lahman" schema
+lahman_sqlite(engine)
 ```
 
 Next we'll set up dbcooper
@@ -57,9 +53,14 @@ The `DbCooper` object contains two important things:
 
 ### Using table accessors
 
+In the example below, we'll use the `"Lahman"."Salaries"` table as an example.
+By default, dbcooper makes this accessible as `.lahman_salaries`.
+
+**Plain** `.lahman_salaries` prints out table and column info, including types and descriptions.
 
 
 ```python
+# show table and column descriptions
 dbc.lahman_salaries
 ```
 
@@ -84,6 +85,12 @@ dbc.lahman_salaries
 
 
 
+Note that sqlite doesn't support table and columnn descriptions, so these sections
+are empty.
+
+**Calling** `.lahman_salaries()` fetches a lazy version of the data.
+
+
 
 ```python
 dbc.lahman_salaries()
@@ -101,6 +108,28 @@ dbc.lahman_salaries()
     2      2    1985    ATL   NL  benedbr01  545000
     3      3    1985    ATL   NL   campri01  633333
     4      4    1985    ATL   NL  ceronri01  625000
+    # .. may have more rows
+
+
+
+Note that this data is a siuba `LazyTbl` object, which you can use to analyze the data.
+
+
+```python
+from siuba import _, count
+
+dbc.lahman_salaries() >> count(over_100k = _.salary > 100_000)
+```
+
+
+
+
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+       over_100k      n
+    0       True  25374
+    1      False   1054
     # .. may have more rows
 
 
@@ -232,12 +261,12 @@ dbc._engine.echo = True
 table_names = dbc.list()
 ```
 
-    2022-03-20 20:41:00,176 INFO sqlalchemy.engine.Engine PRAGMA database_list
-    2022-03-20 20:41:00,177 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 20:41:00,177 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 20:41:00,178 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 20:41:00,178 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 20:41:00,179 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 21:34:41,664 INFO sqlalchemy.engine.Engine PRAGMA database_list
+    2022-03-20 21:34:41,665 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 21:34:41,666 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 21:34:41,667 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 21:34:41,667 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 21:34:41,668 INFO sqlalchemy.engine.Engine [raw sql] ()
 
 
 Note that the log messages above show that the `.list()` method executed two queries:

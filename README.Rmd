@@ -31,18 +31,14 @@ The dbcooper package asks you to create the connection first.
 As an example, we'll use the Lahman baseball database package (`lahman`).
 
 ```{python}
-import lahman
 from sqlalchemy import create_engine
+from dbcooper.data import lahman_sqlite
 
-def load_tables_for_engine(engine, exclude=[], **kwargs):
-    for name in lahman._accessors:
-        if name in exclude: continue
-        df = getattr(lahman, name)()
-        df.to_sql(name, engine, **kwargs)
-
+# connect to sqlite
 engine = create_engine("sqlite://")
-engine.execute("ATTACH ':memory:' AS lahman")
-load_tables_for_engine(engine, schema="lahman")
+
+# load the lahman data into the "lahman" schema
+lahman_sqlite(engine)
 ```
 
 Next we'll set up dbcooper
@@ -60,13 +56,32 @@ The `DbCooper` object contains two important things:
 
 ### Using table accessors
 
+In the example below, we'll use the `"Lahman"."Salaries"` table as an example.
+By default, dbcooper makes this accessible as `.lahman_salaries`.
+
+**Plain** `.lahman_salaries` prints out table and column info, including types and descriptions.
 
 ```{python}
+# show table and column descriptions
 dbc.lahman_salaries
 ```
 
+Note that sqlite doesn't support table and columnn descriptions, so these sections
+are empty.
+
+**Calling** `.lahman_salaries()` fetches a lazy version of the data.
+
+
 ```{python}
 dbc.lahman_salaries()
+```
+
+Note that this data is a siuba `LazyTbl` object, which you can use to analyze the data.
+
+```{python}
+from siuba import _, count
+
+dbc.lahman_salaries() >> count(over_100k = _.salary > 100_000)
 ```
 
 ### Using database functions
