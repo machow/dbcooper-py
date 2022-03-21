@@ -85,11 +85,11 @@ class DbcDocumentedTable(DbcSimpleTable):
 
         table_comment = self._get_table_comment(table)
 
-        return f"""
-            <h3> {table.name} </h3>
-            <p> {table_comment} </p>
-            {self._repr_body(table, "html")}
-            """
+        return f"""\
+<h3> {table.name} </h3>
+<p> {table_comment} </p>
+{self._repr_body(table, "html")}\
+"""
 
     def __repr__(self):
         tbl = self._create_table()
