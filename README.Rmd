@@ -1,4 +1,8 @@
 ```{python include=FALSE, tags=c("hide-cell")}
+# TODO: is there a way to get it so dbc.list() does not show 1 item per line?
+
+# this keeps the pandas dataframe repr from spitting out scoped style tags
+# which don't render on github
 import pandas as pd
 pd.set_option("display.notebook_repr_html", False)
 ```
@@ -91,9 +95,14 @@ dbc.lahman_salaries() >> count(over_100k = _.salary > 100_000)
 * `.query()`: Perform a SQL query and work with the result.
 * `._engine`: Get the underlying sqlalchemy engine.
 
+For instance, we could start by finding the names of the tables in the Lahman database.
+
 ```{python}
 dbc.list()
 ```
+
+We can access one of these tables with `dbc.tbl()`, then put it through any kind
+of siuba operation.
 
 ```{python}
 dbc.tbl("Salaries")
@@ -101,7 +110,7 @@ dbc.tbl("Salaries")
 
 ```{python}
 from siuba import _, count
-dbc.tbl("Salaries") >> count(_.teamID)
+dbc.tbl("Salaries") >> count(_.yearID, sort=True)
 ```
 
 If you'd rather start from a SQL query, use the `.query()` method.
@@ -116,7 +125,7 @@ dbc.query("""
 """)
 ```
 
-For any else you might want to do, the sqlalchemy Engine object is available.
+For anything else you might want to do, the sqlalchemy Engine object is available.
 For example, the code below shows how you can set its `.echo` attribute, which
 tells sqlalchemy to provide useful logs.
 

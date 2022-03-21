@@ -141,6 +141,8 @@ dbc.lahman_salaries() >> count(over_100k = _.salary > 100_000)
 * `.query()`: Perform a SQL query and work with the result.
 * `._engine`: Get the underlying sqlalchemy engine.
 
+For instance, we could start by finding the names of the tables in the Lahman database.
+
 
 ```python
 dbc.list()
@@ -179,6 +181,9 @@ dbc.list()
 
 
 
+We can access one of these tables with `dbc.tbl()`, then put it through any kind
+of siuba operation.
+
 
 ```python
 dbc.tbl("Salaries")
@@ -203,7 +208,7 @@ dbc.tbl("Salaries")
 
 ```python
 from siuba import _, count
-dbc.tbl("Salaries") >> count(_.teamID)
+dbc.tbl("Salaries") >> count(_.yearID, sort=True)
 ```
 
 
@@ -212,12 +217,12 @@ dbc.tbl("Salaries") >> count(_.teamID)
     # Source: lazy query
     # DB Conn: Engine(sqlite://)
     # Preview:
-      teamID    n
-    0    LAN  957
-    1    CLE  949
-    2    PHI  948
-    3    BOS  944
-    4    SLN  943
+       yearID     n
+    0    1999  1006
+    1    1998   998
+    2    1995   986
+    3    1996   931
+    4    1997   925
     # .. may have more rows
 
 
@@ -251,7 +256,7 @@ dbc.query("""
 
 
 
-For any else you might want to do, the sqlalchemy Engine object is available.
+For anything else you might want to do, the sqlalchemy Engine object is available.
 For example, the code below shows how you can set its `.echo` attribute, which
 tells sqlalchemy to provide useful logs.
 
@@ -261,12 +266,12 @@ dbc._engine.echo = True
 table_names = dbc.list()
 ```
 
-    2022-03-20 21:34:41,664 INFO sqlalchemy.engine.Engine PRAGMA database_list
-    2022-03-20 21:34:41,665 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 21:34:41,666 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 21:34:41,667 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 21:34:41,667 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 21:34:41,668 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 21:50:51,818 INFO sqlalchemy.engine.Engine PRAGMA database_list
+    2022-03-20 21:50:51,819 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 21:50:51,820 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 21:50:51,821 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 21:50:51,821 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 21:50:51,822 INFO sqlalchemy.engine.Engine [raw sql] ()
 
 
 Note that the log messages above show that the `.list()` method executed two queries:
