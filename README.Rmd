@@ -60,8 +60,14 @@ The `DbCooper` object contains two important things:
 
 ### Using table accessors
 
-TODO: GIF of accessor + autocompletion (or put it at the very top)
 
+```{python}
+dbc.lahman_salaries
+```
+
+```{python}
+dbc.lahman_salaries()
+```
 
 ### Using database functions
 
@@ -72,8 +78,13 @@ TODO: GIF of accessor + autocompletion (or put it at the very top)
 
 ```{python}
 dbc.list()
-dbc.tbl("Salaries")
+```
 
+```{python}
+dbc.tbl("Salaries")
+```
+
+```{python}
 from siuba import _, count
 dbc.tbl("Salaries") >> count(_.teamID)
 ```
@@ -89,6 +100,19 @@ dbc.query("""
     GROUP BY playerID
 """)
 ```
+
+For any else you might want to do, the sqlalchemy Engine object is available.
+For example, the code below shows how you can set its `.echo` attribute, which
+tells sqlalchemy to provide useful logs.
+
+```{python}
+dbc._engine.echo = True
+table_names = dbc.list()
+```
+
+Note that the log messages above show that the `.list()` method executed two queries:
+One to list tables in the "main" schema (which is empty), and one to list tables
+in the "lahman" schema.
 
 ## Developing
 

@@ -57,7 +57,55 @@ The `DbCooper` object contains two important things:
 
 ### Using table accessors
 
-TODO: GIF of accessor + autocompletion (or put it at the very top)
+
+
+```python
+dbc.lahman_salaries
+```
+
+
+
+
+
+            <h3> salaries </h3>
+            <p> (No table description.) </p>
+            <table>
+<thead>
+<tr><th>name    </th><th>type  </th><th>description  </th></tr>
+</thead>
+<tbody>
+<tr><td>index   </td><td>BIGINT</td><td>             </td></tr>
+<tr><td>yearID  </td><td>BIGINT</td><td>             </td></tr>
+<tr><td>teamID  </td><td>TEXT  </td><td>             </td></tr>
+<tr><td>lgID    </td><td>TEXT  </td><td>             </td></tr>
+<tr><td>playerID</td><td>TEXT  </td><td>             </td></tr>
+<tr><td>salary  </td><td>BIGINT</td><td>             </td></tr>
+</tbody>
+</table>
+
+
+
+
+
+```python
+dbc.lahman_salaries()
+```
+
+
+
+
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+       index  yearID teamID lgID   playerID  salary
+    0      0    1985    ATL   NL  barkele01  870000
+    1      1    1985    ATL   NL  bedrost01  550000
+    2      2    1985    ATL   NL  benedbr01  545000
+    3      3    1985    ATL   NL   campri01  633333
+    4      4    1985    ATL   NL  ceronri01  625000
+    # .. may have more rows
+
+
 
 ### Using database functions
 
@@ -69,8 +117,64 @@ TODO: GIF of accessor + autocompletion (or put it at the very top)
 
 ```python
 dbc.list()
-dbc.tbl("Salaries")
+```
 
+
+
+
+    ['lahman.allstar_full',
+     'lahman.appearances',
+     'lahman.awards_managers',
+     'lahman.awards_players',
+     'lahman.awards_share_managers',
+     'lahman.awards_share_players',
+     'lahman.batting',
+     'lahman.batting_post',
+     'lahman.college_playing',
+     'lahman.fielding',
+     'lahman.fielding_of',
+     'lahman.fielding_ofsplit',
+     'lahman.fielding_post',
+     'lahman.hall_of_fame',
+     'lahman.home_games',
+     'lahman.managers',
+     'lahman.managers_half',
+     'lahman.parks',
+     'lahman.people',
+     'lahman.pitching',
+     'lahman.pitching_post',
+     'lahman.salaries',
+     'lahman.schools',
+     'lahman.series_post',
+     'lahman.teams',
+     'lahman.teams_franchises',
+     'lahman.teams_half']
+
+
+
+
+```python
+dbc.tbl("Salaries")
+```
+
+
+
+
+    # Source: lazy query
+    # DB Conn: Engine(sqlite://)
+    # Preview:
+       index  yearID teamID lgID   playerID  salary
+    0      0    1985    ATL   NL  barkele01  870000
+    1      1    1985    ATL   NL  bedrost01  550000
+    2      2    1985    ATL   NL  benedbr01  545000
+    3      3    1985    ATL   NL   campri01  633333
+    4      4    1985    ATL   NL  ceronri01  625000
+    # .. may have more rows
+
+
+
+
+```python
 from siuba import _, count
 dbc.tbl("Salaries") >> count(_.teamID)
 ```
@@ -119,6 +223,28 @@ dbc.query("""
     # .. may have more rows
 
 
+
+For any else you might want to do, the sqlalchemy Engine object is available.
+For example, the code below shows how you can set its `.echo` attribute, which
+tells sqlalchemy to provide useful logs.
+
+
+```python
+dbc._engine.echo = True
+table_names = dbc.list()
+```
+
+    2022-03-20 20:36:22,624 INFO sqlalchemy.engine.Engine PRAGMA database_list
+    2022-03-20 20:36:22,625 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 20:36:22,626 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 20:36:22,627 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 20:36:22,628 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 20:36:22,628 INFO sqlalchemy.engine.Engine [raw sql] ()
+
+
+Note that the log messages above show that the `.list()` method executed two queries:
+One to list tables in the "main" schema (which is empty), and one to list tables
+in the "lahman" schema.
 
 ## Developing
 
