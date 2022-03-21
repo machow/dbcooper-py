@@ -9,5 +9,5 @@ del _v
 # Main imports ----------------------------------------------------------------
 
 from .dbcooper import DbCooper    # noqa
-from .finder import TableFinder, AccessorBuilder
+from .finder import TableFinder, AccessorBuilder, AccessorHierarchyBuilder
 from .tables import DbcDocumentedTable, DbcSimpleTable
