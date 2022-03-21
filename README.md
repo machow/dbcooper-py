@@ -66,10 +66,9 @@ dbc.lahman_salaries
 
 
 
-
-            <h3> salaries </h3>
-            <p> (No table description.) </p>
-            <table>
+<h3> salaries </h3>
+<p> (No table description.) </p>
+<table>
 <thead>
 <tr><th>name    </th><th>type  </th><th>description  </th></tr>
 </thead>
@@ -82,7 +81,6 @@ dbc.lahman_salaries
 <tr><td>salary  </td><td>BIGINT</td><td>             </td></tr>
 </tbody>
 </table>
-
 
 
 
@@ -234,12 +232,12 @@ dbc._engine.echo = True
 table_names = dbc.list()
 ```
 
-    2022-03-20 20:36:22,624 INFO sqlalchemy.engine.Engine PRAGMA database_list
-    2022-03-20 20:36:22,625 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 20:36:22,626 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 20:36:22,627 INFO sqlalchemy.engine.Engine [raw sql] ()
-    2022-03-20 20:36:22,628 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
-    2022-03-20 20:36:22,628 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 20:41:00,176 INFO sqlalchemy.engine.Engine PRAGMA database_list
+    2022-03-20 20:41:00,177 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 20:41:00,177 INFO sqlalchemy.engine.Engine SELECT name FROM "main".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 20:41:00,178 INFO sqlalchemy.engine.Engine [raw sql] ()
+    2022-03-20 20:41:00,178 INFO sqlalchemy.engine.Engine SELECT name FROM "lahman".sqlite_master WHERE type='table' ORDER BY name
+    2022-03-20 20:41:00,179 INFO sqlalchemy.engine.Engine [raw sql] ()
 
 
 Note that the log messages above show that the `.list()` method executed two queries:
