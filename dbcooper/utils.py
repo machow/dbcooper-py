@@ -10,8 +10,11 @@ class SingleGeneric:
 
         return f_concrete(dialect, *args, **kwargs)
 
+    def trait(self, obj):
+        return getattr(obj, self.dispatch_on_attr)
+
     def dispatch(self, obj):
-        type_str = getattr(obj, self.dispatch_on_attr)
+        type_str = self.trait(obj)
 
         try:
             f_concrete = self.registry[type_str]
