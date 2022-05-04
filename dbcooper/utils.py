@@ -6,7 +6,12 @@ class SingleGeneric:
         self.default = None
 
     def __call__(self, dialect, *args, **kwargs):
-        type_str = getattr(dialect, self.dispatch_on_attr)
+        f_concrete = self.dispatch(dialect)
+
+        return f_concrete(dialect, *args, **kwargs)
+
+    def dispatch(self, obj):
+        type_str = getattr(obj, self.dispatch_on_attr)
 
         try:
             f_concrete = self.registry[type_str]
@@ -16,7 +21,7 @@ class SingleGeneric:
             else:
                 raise NotImplementedError(f"Cannot dispatch on {type_str} and no default implementation.")
 
-        return f_concrete(dialect, *args, **kwargs)
+        return f_concrete
 
     def register(self, type_str, func=None):
         # allow it to function as a decorator
