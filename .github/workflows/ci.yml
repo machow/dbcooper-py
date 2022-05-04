@@ -36,7 +36,7 @@ jobs:
           docker-compose up --build -d
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@v0
         with:
           project_id: siuba-tests
           service_account_key: ${{ secrets.GCP_SA_KEY }}
