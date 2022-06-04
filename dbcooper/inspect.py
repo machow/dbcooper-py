@@ -80,17 +80,21 @@ def _list_tables_sf(self: Dialect, conn, exclude=None) -> Sequence[TableName]:
     if exclude is None:
         exclude = ("INFORMATION_SCHEMA",)
 
+    db = conn.engine.url.database
+    default_db_set = db != ""
+    in_clause = f" IN DATABASE {db}" if default_db_set else " IN ACCOUNT"
+
     tables = conn.execute(sql.text(
-        "SHOW TERSE TABLES"
+        "SHOW TERSE TABLES" + in_clause
     ))
 
     views = conn.execute(sql.text(
-        "SHOW TERSE VIEWS"
+        "SHOW TERSE VIEWS" + in_clause
     ))
 
     result = []
     for row in itertools.chain(tables, views):
-        if conn.connection.connection.database is not None:
+        if default_db_set:
             # a default database is set. snowflake's dialect automatically prepends
             # the default database name everywhere, so we need to set database
             # to None in our results
