@@ -8,7 +8,7 @@ params_backend = [
     pytest.param(lambda: SqlBackend("mysql"), id = "mysql", marks=pytest.mark.mysql),
     pytest.param(lambda: SqlBackend("sqlite"), id = "sqlite", marks=pytest.mark.sqlite),
     pytest.param(lambda: BigqueryBackend("bigquery"), id = "bigquery", marks=pytest.mark.bigquery),
-    pytest.param(lambda: BigqueryBackend("snowflake"), id = "snowflake", marks=pytest.mark.snowflake),
+    pytest.param(lambda: CloudBackend("snowflake"), id = "snowflake", marks=pytest.mark.snowflake),
     ]
 
 @pytest.fixture(params=params_backend, scope = "session")
