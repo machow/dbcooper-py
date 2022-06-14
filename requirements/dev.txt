@@ -50,7 +50,7 @@ debugpy==1.6.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
-docutils==0.18.1
+docutils==0.17.1
     # via
     #   pydata-sphinx-theme
     #   sphinx
@@ -278,8 +278,10 @@ snowflake-sqlalchemy==1.3.4
     # via dbcooper (setup.cfg)
 soupsieve==2.3.2.post1
     # via beautifulsoup4
-sphinx==5.0.1
-    # via pydata-sphinx-theme
+sphinx==4.4.0
+    # via
+    #   dbcooper (setup.cfg)
+    #   pydata-sphinx-theme
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
