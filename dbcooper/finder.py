@@ -88,7 +88,7 @@ class AccessorBuilder:
     def __init__(
         self,
         format_from_part=None,
-        name_format: "str | Callable[TableName, str]" = "identity",
+        name_format: "str | Callable[TableName, str]" = "lower",
     ):
         self.format_from_part=format_from_part
         self.name_format=name_format
