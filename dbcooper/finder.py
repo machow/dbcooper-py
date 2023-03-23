@@ -158,10 +158,10 @@ class AccessorHierarchyBuilder(AccessorBuilder):
             acc_db[schema] = sub_accessors
 
         if self.omit_database:
-            if len(acc_db) != 1:
+            if len(res) != 1:
                 raise ValueError(
                     "Omitting database requires exactly 1 database entry, but found "
-                    f"the following: {list(acc_db)}"
+                    f"the following: {list(res)}"
                 )
 
             # return the only entry in the accessors dictionary
