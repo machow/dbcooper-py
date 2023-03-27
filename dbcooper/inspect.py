@@ -57,6 +57,7 @@ def _list_tables_mysql(self: Dialect, conn, exclude=None) -> Sequence[TableName]
 
 
 @list_tables.register("postgresql")
+@list_tables.register("duckdb")
 def _list_tables_pg(self: Dialect, conn, exclude=None) -> Sequence[TableName]:
     if exclude is None:
         exclude = ("information_schema", "pg_catalog")
@@ -66,7 +67,22 @@ def _list_tables_pg(self: Dialect, conn, exclude=None) -> Sequence[TableName]:
         JOIN pg_namespace n ON n.oid = c.relnamespace
         CROSS JOIN (SELECT current_database() AS db_name) db
         WHERE
-            c.relkind in ('r', 'p')
+            c.relkind in ('r', 'p', 'v')
+    """))
+
+    result = [TableName(*row) for row in q]
+
+    return _filter_result(result, exclude)
+
+
+@list_tables.register("duckdb")
+def _list_tables_pg(self: Dialect, conn, exclude=None) -> Sequence[TableName]:
+    if exclude is None:
+        exclude = ("information_schema", "pg_catalog")
+
+    q = conn.execute(sql.text("""
+        SELECT db.db_name, table_schema, table_name FROM information_schema.tables c
+        CROSS JOIN (SELECT current_database() AS db_name) db
     """))
 
     result = [TableName(*row) for row in q]
