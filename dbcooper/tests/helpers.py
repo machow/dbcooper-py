@@ -7,10 +7,10 @@ from siuba.tests.helpers import SqlBackend, BigqueryBackend, assert_frame_sort_e
 
 EXAMPLE_SCHEMAS  = {
     ("mai", "lower"): "mai_lower",
-    ("mai", "UPPER"): "mai_UPPER",
-    ("mai", "MiXeD"): "mai_MiXeD",
+    ("mai", "UPPER"): "mai_upper",
+    ("mai", "MiXeD"): "mai_mixed",
 
-    ("MAIN_UPPER", "some_table"): "MAIN_UPPER_some_table",
+    ("MAIN_UPPER", "some_table"): "main_upper_some_table",
 }
 
 
