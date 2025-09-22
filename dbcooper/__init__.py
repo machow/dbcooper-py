@@ -11,3 +11,12 @@ del _v
 from .dbcooper import DbCooper    # noqa
 from .finder import TableFinder, AccessorBuilder, AccessorHierarchyBuilder
 from .tables import DbcDocumentedTable, DbcSimpleTable
+
+__all__ = (
+    "DbCooper",
+    "TableFinder",
+    "AccessorBuilder",
+    "AccessorHierarchyBuilder",
+    "DbcDocumentedTable",
+    "DbcSimpleTable",
+)
