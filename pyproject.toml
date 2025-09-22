@@ -23,13 +23,14 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
+    "psycopg2>=2.9.10",
     "siuba>=0.2.0",
     "sqlalchemy",
-    "tabulate"
+    "tabulate",
 ]
-requires-python = ">3.8"
+requires-python = ">=3.10"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pip-tools",
     "importlib-resources",
@@ -42,7 +43,9 @@ dev = [
     "snowflake-sqlalchemy",
     "psycopg2-binary",
     "pymysql",
-    "jupytext"
+    "jupytext",
+    "numpy<2.0",
+    "sqlalchemy<2.0",
 ]
 
 binder = [
