@@ -9,7 +9,8 @@ def query_to_tbl(engine, query: str) -> LazyTbl:
         SELECT * FROM (\n{query}\n) WHERE 1 = 0
     """
 
-    q = engine.execute(sql.text(full_query))
+    with engine.connect() as con:
+        q = con.execute(sql.text(full_query))
     
     columns = [sql.column(k) for k in q.keys()]
     text_as_from = sql.text(query).columns(*columns).alias()
@@ -23,7 +24,8 @@ def name_to_tbl(engine, table_name, schema=None) -> LazyTbl:
     explore_table = sql.table(table_name, schema=schema)
     trivial = explore_table.select(sql.text("0 = 1")).add_columns(sql.text("*"))
 
-    q = engine.execute(trivial)
+    with engine.connect() as con:
+        q = con.execute(trivial)
 
     columns = [sql.column(k) for k in q.keys()]
     return LazyTbl(engine, sql.table(table_name, *columns, schema=schema))

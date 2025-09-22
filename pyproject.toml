@@ -2,6 +2,57 @@
 requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools_scm]
+
+[tool.setuptools.packages.find]
+include = ["dbcooper"]
+
+[project]
+name = "dbcooper"
+description = "The dbcooper package turns a database connection into a collection of functions, handling logic for keeping track of connections and letting you take advantage of autocompletion when exploring a database."
+readme = "README.md"
+keywords = ["template", "packaging"]
+license.text = "MIT"
+authors = [
+    { name = "Michael Chow", email = "mc_al_github@fastmail.com" }
+]
+dynamic = ["version"]
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "psycopg2>=2.9.10",
+    "siuba>=0.2.0",
+    "sqlalchemy",
+    "tabulate",
+]
+requires-python = ">=3.10"
+
+[dependency-groups]
+dev = [
+    "pip-tools",
+    "importlib-resources",
+    "ipykernel",
+    "pydata-sphinx-theme",
+    "pytest",
+    "pytest-dotenv",
+    "sqlalchemy-bigquery",
+    "sphinx~=4.4.0",
+    "snowflake-sqlalchemy",
+    "psycopg2-binary",
+    "pymysql",
+    "jupytext",
+    "numpy<2.0",
+    "sqlalchemy<2.0",
+]
+
+binder = [
+    "jupytext",
+    "lahman"
+]
+
 [tool.pytest.ini_options]
 markers = [
     "ex: a test runs against ExampleClass",
@@ -11,4 +62,9 @@ testpaths = [
     "dbcooper",
 ]
 
-[tool.setuptools_scm]
+[tool.ruff.lint]
+max-line-length = 90
+ignore = [
+    "E501",    # line too long
+    "W503",    # line before binary operator
+]

@@ -71,7 +71,8 @@ def _create_examples_default(engine):
     ip = engine.dialect.identifier_preparer
 
     for schema, table in EXAMPLE_SCHEMAS.keys():
-        engine.execute(f"CREATE SCHEMA IF NOT EXISTS {ip.quote_identifier(schema)}")
+        with engine.connect() as conn:
+            conn.execute(f"CREATE SCHEMA IF NOT EXISTS {ip.quote_identifier(schema)}")
         write_table(engine, EXAMPLE_DATA, table, schema)
 
 @create_examples.register("sqlite")
@@ -81,7 +82,8 @@ def _create_examples_sqlite(engine):
 
     for schema, table in EXAMPLE_SCHEMAS.keys():
         if schema not in prev_schemas:
-            engine.execute(f"ATTACH DATABASE ':memory:' AS {ip.quote_identifier(schema)}")
+            with engine.connect() as conn:
+                conn.execute(f"ATTACH DATABASE ':memory:' AS {ip.quote_identifier(schema)}")
 
         prev_schemas.add(schema)
         write_table(engine, EXAMPLE_DATA, table, schema)
