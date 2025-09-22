@@ -52,7 +52,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
       - name: Install dependencies
         run: |
-          uv sync --dev
+          uv sync --dev -m postgresql mysql sqlite
       - name: Run tests
         run: |
           pytest
