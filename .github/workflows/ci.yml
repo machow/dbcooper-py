@@ -55,7 +55,7 @@ jobs:
           uv sync --dev
       - name: Run tests
         run: |
-          pytest -m postgresql mysql sqlite
+          uv run pytest -m postgresql mysql sqlite
         env:
           SB_TEST_MYSQLPORT: 3307
           SB_TEST_PGPORT: 5433
