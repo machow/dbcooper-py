@@ -3,7 +3,7 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: ['main', 'dev-*']
+    branches: ["main", "dev-*"]
   pull_request:
   release:
     types: [published]
@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         # Checks based on python versions ---
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ["3.8", "3.9", "3.10"]
         requirements: [""]
 
     steps:
@@ -34,7 +34,7 @@ jobs:
       #
       - name: Run docker-compose
         run: |
-          docker-compose up --build -d
+          docker compose up --build -d
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
@@ -79,7 +79,6 @@ jobs:
           SB_TEST_SNOWFLAKEHOST: "qf04441.us-east-2.aws"
           SB_TEST_SNOWFLAKEOPTIONS: "warehouse=COMPUTE_WH&role=USER_DBCOOPER_CI"
 
-
   build-docs:
     name: "Build Docs"
     needs: ["run-if"]
@@ -97,23 +96,22 @@ jobs:
         run: |
           make docs-build
 
-
   release-pypi:
-      name: "Release to pypi"
-      runs-on: ubuntu-latest
-      if: github.event_name == 'release'
-      needs: [build-docs]
-      steps:
-        - uses: actions/checkout@v2
-        - uses: actions/setup-python@v2
-          with:
-            python-version: "3.10"
-        - name: "Build Package"
-          run: |
-            python -m pip install build wheel
-            python -m build --sdist --wheel
-        - name: "Deploy to Test PyPI"
-          uses: pypa/gh-action-pypi-publish@release/v1
-          with:
-            user: __token__
-            password: ${{ secrets.PYPI_API_TOKEN }}
+    name: "Release to pypi"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    needs: [build-docs]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: "Build Package"
+        run: |
+          python -m pip install build wheel
+          python -m build --sdist --wheel
+      - name: "Deploy to Test PyPI"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
