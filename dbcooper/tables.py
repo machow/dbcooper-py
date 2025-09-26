@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from tabulate import tabulate
-from siuba.sql import LazyTbl
 from typing import TYPE_CHECKING
 from sqlalchemy import Table, MetaData
 
