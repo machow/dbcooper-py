@@ -23,12 +23,15 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 dependencies = [
-    "psycopg2>=2.9.10",
-    "siuba>=0.2.0",
     "sqlalchemy",
     "tabulate",
 ]
 requires-python = ">=3.10"
+
+[project.optional-dependencies]
+siuba = [
+    "siuba>=0.4.4",
+]
 
 [dependency-groups]
 dev = [
@@ -45,7 +48,11 @@ dev = [
     "pymysql",
     "jupytext",
     "numpy<2.0",
-    "sqlalchemy<2.0",
+    "polars>=1.33.1",
+    "duckdb<1.4.0",
+    "siuba==0.4.5.dev1",
+    "duckdb-engine>=0.17.0",
+    "pyarrow>=21.0.0",
 ]
 
 binder = [
