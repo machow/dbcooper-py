@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from sqlalchemy import create_engine
 
 from .finder import TableFinder, AccessorBuilder
-from .tables import DbcDocumentedTable, query_to_tbl, name_to_tbl
+from .tables import DbcDocumentedTable
+from .collect import query_to_tbl, name_to_tbl, to_siuba
 
 import typing
 
@@ -16,17 +19,19 @@ class DbCooper:
         table_finder=TableFinder(),
         table_factory=DbcDocumentedTable,
         accessor_builder=AccessorBuilder(),
+        to_frame=to_siuba,
         initialize=True,
     ):
 
         if isinstance(engine, str):
             engine = create_engine(engine)
 
-        self._engine = engine
+        self._engine: Engine = engine
         self._accessors = {}
         self._table_finder = table_finder
         self._table_factory = table_factory
-        self._accessor_builder=accessor_builder
+        self._accessor_builder = accessor_builder
+        self._to_frame = to_frame
 
         if initialize:
             self._init()
@@ -58,7 +63,8 @@ class DbCooper:
         accessors = self._accessor_builder.create_accessors(
             self._engine,
             self._table_factory,
-            table_map
+            table_map,
+            self._to_frame,
         )
         self._accessors = accessors
 
@@ -81,7 +87,9 @@ class DbCooper:
             return results
 
     def query(self, query):
-        return query_to_tbl(self._engine, query)
+        expr = query_to_tbl(self._engine, query)
+        return self._to_frame(self._engine, expr)
 
     def tbl(self, name, schema=None):
-        return name_to_tbl(self._engine, name, schema)
+        expr = name_to_tbl(self._engine, name, schema)
+        return self._to_frame(self._engine, expr)

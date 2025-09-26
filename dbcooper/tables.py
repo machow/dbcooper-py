@@ -1,40 +1,23 @@
+from __future__ import annotations
+
 from tabulate import tabulate
 from siuba.sql import LazyTbl
-from sqlalchemy import sql
+from typing import TYPE_CHECKING
+from sqlalchemy import Table, MetaData
 
+from .collect import name_to_tbl, to_siuba
 
-def query_to_tbl(engine, query: str) -> LazyTbl:
-
-    full_query = f"""
-        SELECT * FROM (\n{query}\n) WHERE 1 = 0
-    """
-
-    with engine.connect() as con:
-        q = con.execute(sql.text(full_query))
-    
-    columns = [sql.column(k) for k in q.keys()]
-    text_as_from = sql.text(query).columns(*columns).alias()
-
-    return LazyTbl(engine, text_as_from)
-
-
-def name_to_tbl(engine, table_name, schema=None) -> LazyTbl:
-    # sql dialects like snowflake do not have great reflection capabilities,
-    # so we execute a trivial query to discover the column names
-    explore_table = sql.table(table_name, schema=schema)
-    trivial = explore_table.select(sql.text("0 = 1")).add_columns(sql.text("*"))
-
-    with engine.connect() as con:
-        q = con.execute(trivial)
-
-    columns = [sql.column(k) for k in q.keys()]
-    return LazyTbl(engine, sql.table(table_name, *columns, schema=schema))
+if TYPE_CHECKING:
+    import sqlalchemy as sqla
+    from sqlalchemy.engine import Engine
 
 class DbcSimpleTable:
-    def __init__(self, engine, table_name, schema=None):
+    """Represent a database table."""
+    def __init__(self, engine: Engine, table_name: str, schema: str | None = None, to_frame=to_siuba):
         self.engine = engine
         self.table_name = table_name
         self.schema = schema
+        self.to_frame = to_frame
 
     def __repr__(self):
         repr_args = map(repr, [self.table_name, self.schema])
@@ -45,14 +28,15 @@ class DbcSimpleTable:
         raise NotImplementedError()
 
     def __call__(self):
-        return self._create_table()
+        sqla_tbl = self._create_table()
+        return self.to_frame(self.engine, sqla_tbl)
 
-    def _create_table(self):
+    def _create_table(self) -> sqla.sql.TableClause:
         return name_to_tbl(self.engine, self.table_name, self.schema)
 
 
 class DbcDocumentedTable(DbcSimpleTable):
-    """Represent a database table.
+    """Represent a database table with a nice column summary (including comments).
 
     Note that this class's objects return a siuba LazyTbl when called, and print
     out the table and column descriptions otherwise.
@@ -60,10 +44,9 @@ class DbcDocumentedTable(DbcSimpleTable):
 
     table_comment_fields = {"name": "name", "type": "type", "description": "comment"}
 
-    def _create_table(self):
-        from sqlalchemy import Table, MetaData
+    def _create_table(self) -> sqla.Table:
         table = Table(self.table_name, MetaData(), schema=self.schema, autoload_with = self.engine)
-        return LazyTbl(self.engine, table)
+        return table
 
     # methods for representation ----------------------------------------------
 
@@ -82,8 +65,7 @@ class DbcDocumentedTable(DbcSimpleTable):
             return table.comment
 
     def _repr_html_(self):
-        tbl = self._create_table()
-        table = tbl.tbl
+        table = self._create_table()
 
         table_comment = self._get_table_comment(table)
 
@@ -94,8 +76,7 @@ class DbcDocumentedTable(DbcSimpleTable):
 """
 
     def __repr__(self):
-        tbl = self._create_table()
-        table = tbl.tbl
+        table = self._create_table()
 
         table_comment = self._get_table_comment(table)
 

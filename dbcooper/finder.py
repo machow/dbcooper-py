@@ -4,7 +4,12 @@ from collections.abc import Mapping
 
 from .inspect import TableName, TableIdentity, list_tables, format_table, identify_table
 
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
+
+
+if TYPE_CHECKING:
+    from .tables import DbcSimpleTable
+
 
 def _set_default(d, k, default):
     """Same behavior as dict.setdefault"""
@@ -109,7 +114,7 @@ class AccessorBuilder:
                 "Unknown name_format argument type: {type(self.name_format)}"
             )
 
-    def create_accessors(self, engine, table_factory, table_map: Mapping[TableName, TableIdentity]):
+    def create_accessors(self, engine, table_factory: DbcSimpleTable, table_map: Mapping[TableName, TableIdentity], to_frame):
         accessors = AttributeDict()
 
         for table, ident in table_map.items():
@@ -117,7 +122,7 @@ class AccessorBuilder:
             if fmt_name in accessors:
                 raise Exception("multiple tables w/ formatted name: %s" % fmt_name)
 
-            accessors[fmt_name] = table_factory(engine, ident.table, ident.schema)
+            accessors[fmt_name] = table_factory(engine, ident.table, ident.schema, to_frame)
 
         return accessors
 
@@ -141,13 +146,13 @@ class AccessorHierarchyBuilder(AccessorBuilder):
         grouped = groupby(sorted_items, lambda x: (x[0].database, x[0].schema))
         return {group_key: dict(iter_) for group_key, iter_ in grouped}
 
-    def create_accessors(self, engine, table_factory, table_map):
+    def create_accessors(self, engine, table_factory, table_map, to_frame):
 
         grouped = self._group_by_level(table_map)
 
         res = AttributeDict()
         for (db, schema), sub_map in grouped.items():
-            sub_accessors = super().create_accessors(engine, table_factory, sub_map)
+            sub_accessors = super().create_accessors(engine, table_factory, sub_map, to_frame)
             acc_db = _set_default(res, db, AttributeDict())
             if schema in acc_db:
                 raise ValueError(
